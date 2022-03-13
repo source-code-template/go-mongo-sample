@@ -9,9 +9,8 @@ require (
 	github.com/core-go/mongo v0.3.0
 	github.com/core-go/search v0.2.5
 	github.com/core-go/service v0.1.9
-	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/go-playground/validator/v10 v10.10.1 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	go.mongodb.org/mongo-driver v1.8.4
-	gorm.io/gorm v1.23.2 // indirect
 )

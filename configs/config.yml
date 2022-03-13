@@ -1,9 +1,9 @@
 server:
-  name: gorm-tutorial
+  name: go-mongo-layer-architecture-sample
   port: 8080
 
 mongo:
-  uri: mongodb://localhost:27017
+  uri: mongodb+srv://dbUser:Demoaccount1@projectdemo.g0lah.mongodb.net
   database: masterdata
 
 log:
