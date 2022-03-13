@@ -47,7 +47,7 @@ func (r *userRepository) Load(ctx context.Context, id string) (*User, error) {
 	filter := bson.M{"_id": id}
 	res := r.Collection.FindOne(ctx, filter)
 	if res.Err() != nil {
-		if strings.Compare(fmt.Sprint(res.Err()), "mongo: no documents in res") == 0 {
+		if strings.Compare(fmt.Sprint(res.Err()), "mongo: no documents in result") == 0 {
 			return nil, nil
 		} else {
 			return nil, res.Err()
