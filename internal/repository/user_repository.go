@@ -35,12 +35,12 @@ func (r *userRepository) All(ctx context.Context) (*[]User, error) {
 	if er1 != nil {
 		return nil, er1
 	}
-	var res []User
-	er2 := cursor.All(ctx, &res)
+	var users []User
+	er2 := cursor.All(ctx, &users)
 	if er2 != nil {
 		return nil, er2
 	}
-	return &res, nil
+	return &users, nil
 }
 
 func (r *userRepository) Load(ctx context.Context, id string) (*User, error) {
@@ -53,7 +53,7 @@ func (r *userRepository) Load(ctx context.Context, id string) (*User, error) {
 			return nil, res.Err()
 		}
 	}
-	user := User{}
+	var user User
 	err := res.Decode(&user)
 	if err != nil {
 		return nil, err

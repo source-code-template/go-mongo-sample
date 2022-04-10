@@ -18,7 +18,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	r := mux.NewRouter()
 
 	log.Initialize(conf.Log)
