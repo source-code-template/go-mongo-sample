@@ -56,7 +56,11 @@ func (h *userHandler) Load(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	JSON(w, http.StatusOK, user)
+	status := http.StatusOK
+	if user == nil {
+		status = http.StatusNotFound
+	}
+	JSON(w, status, user)
 }
 func (h *userHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var user User
@@ -99,7 +103,11 @@ func (h *userHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, er2.Error(), http.StatusInternalServerError)
 		return
 	}
-	JSON(w, http.StatusOK, res)
+	if res <= 0 {
+		JSON(w, http.StatusNotFound, res)
+	} else {
+		JSON(w, http.StatusOK, res)
+	}
 }
 func (h *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
@@ -133,7 +141,11 @@ func (h *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, er3.Error(), http.StatusInternalServerError)
 		return
 	}
-	JSON(w, http.StatusOK, res)
+	if res <= 0 {
+		JSON(w, http.StatusNotFound, res)
+	} else {
+		JSON(w, http.StatusOK, res)
+	}
 }
 func (h *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
@@ -146,7 +158,11 @@ func (h *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	JSON(w, http.StatusOK, res)
+	if res <= 0 {
+		JSON(w, http.StatusNotFound, res)
+	} else {
+		JSON(w, http.StatusOK, res)
+	}
 }
 
 func JSON(w http.ResponseWriter, code int, res interface{}) error {
