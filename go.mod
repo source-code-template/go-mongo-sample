@@ -10,8 +10,7 @@ require (
 	github.com/core-go/mongo v0.3.2
 	github.com/core-go/search v0.2.8
 	github.com/gorilla/mux v1.8.0
-	github.com/kr/pretty v0.3.0 // indirect
-	github.com/rogpeppe/go-internal v1.8.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.2
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
