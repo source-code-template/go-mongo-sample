@@ -22,14 +22,14 @@ type UserRepository interface {
 }
 
 func NewUserRepository(db *mongo.Database) UserRepository {
-	return &userRepository{Collection: db.Collection("users")}
+	return &UserAdapter{Collection: db.Collection("users")}
 }
 
-type userRepository struct {
+type UserAdapter struct {
 	Collection *mongo.Collection
 }
 
-func (r *userRepository) All(ctx context.Context) (*[]User, error) {
+func (r *UserAdapter) All(ctx context.Context) (*[]User, error) {
 	filter := bson.M{}
 	cursor, er1 := r.Collection.Find(ctx, filter)
 	if er1 != nil {
@@ -43,7 +43,7 @@ func (r *userRepository) All(ctx context.Context) (*[]User, error) {
 	return &users, nil
 }
 
-func (r *userRepository) Load(ctx context.Context, id string) (*User, error) {
+func (r *UserAdapter) Load(ctx context.Context, id string) (*User, error) {
 	filter := bson.M{"_id": id}
 	res := r.Collection.FindOne(ctx, filter)
 	if res.Err() != nil {
@@ -61,7 +61,7 @@ func (r *userRepository) Load(ctx context.Context, id string) (*User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) Create(ctx context.Context, user *User) (int64, error) {
+func (r *UserAdapter) Create(ctx context.Context, user *User) (int64, error) {
 	_, err := r.Collection.InsertOne(ctx, user)
 	if err != nil {
 		errMsg := err.Error()
@@ -71,14 +71,13 @@ func (r *userRepository) Create(ctx context.Context, user *User) (int64, error) 
 			} else {
 				return -1, nil
 			}
-		} else {
-			return 0, err
 		}
+		return 0, err
 	}
 	return 1, nil
 }
 
-func (r *userRepository) Update(ctx context.Context, user *User) (int64, error) {
+func (r *UserAdapter) Update(ctx context.Context, user *User) (int64, error) {
 	filter := bson.M{"_id": user.Id}
 	update := bson.M{
 		"$set": user,
@@ -93,7 +92,7 @@ func (r *userRepository) Update(ctx context.Context, user *User) (int64, error) 
 	}
 }
 
-func (r *userRepository) Patch(ctx context.Context, user map[string]interface{}) (int64, error) {
+func (r *UserAdapter) Patch(ctx context.Context, user map[string]interface{}) (int64, error) {
 	userType := reflect.TypeOf(User{})
 	bsonMap := mgo.MakeBsonMap(userType)
 	filter := mgo.BuildQueryByIdFromMap(user, "id")
@@ -101,7 +100,7 @@ func (r *userRepository) Patch(ctx context.Context, user map[string]interface{})
 	return mgo.PatchOne(ctx, r.Collection, bson, filter)
 }
 
-func (r *userRepository) Delete(ctx context.Context, id string) (int64, error) {
+func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
 	filter := bson.M{"_id": id}
 	res, err := r.Collection.DeleteOne(ctx, filter)
 	if res == nil || err != nil {
