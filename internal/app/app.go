@@ -35,7 +35,7 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 	userQuery := query.UseQuery(userType)
 	userSearchBuilder := mgo.NewSearchBuilder(db, "users", userQuery, search.GetSort)
 	userRepository := NewUserAdapter(db)
-	userService := NewUserService(userRepository)
+	userService := NewUserUseCase(userRepository)
 	userHandler := NewUserHandler(userSearchBuilder.Search, userService, logError)
 
 	mongoChecker := mgo.NewHealthChecker(db)

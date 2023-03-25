@@ -13,23 +13,26 @@ import (
 )
 
 func NewUserAdapter(db *mongo.Database) *UserAdapter {
-	return &UserAdapter{Collection: db.Collection("users")}
+	userType := reflect.TypeOf(User{})
+	bsonMap := mgo.MakeBsonMap(userType)
+	return &UserAdapter{Collection: db.Collection("users"), Map: bsonMap}
 }
 
 type UserAdapter struct {
 	Collection *mongo.Collection
+	Map        map[string]string
 }
 
 func (r *UserAdapter) All(ctx context.Context) (*[]User, error) {
 	filter := bson.M{}
-	cursor, er1 := r.Collection.Find(ctx, filter)
-	if er1 != nil {
-		return nil, er1
+	cursor, err := r.Collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
 	}
 	var users []User
-	er2 := cursor.All(ctx, &users)
-	if er2 != nil {
-		return nil, er2
+	err = cursor.All(ctx, &users)
+	if err != nil {
+		return nil, err
 	}
 	return &users, nil
 }
@@ -70,24 +73,14 @@ func (r *UserAdapter) Create(ctx context.Context, user *User) (int64, error) {
 
 func (r *UserAdapter) Update(ctx context.Context, user *User) (int64, error) {
 	filter := bson.M{"_id": user.Id}
-	update := bson.M{
-		"$set": user,
-	}
+	update := bson.M{"$set": user}
 	res, err := r.Collection.UpdateOne(ctx, filter, update)
-	if res.ModifiedCount > 0 {
-		return res.ModifiedCount, err
-	} else if res.UpsertedCount > 0 {
-		return res.UpsertedCount, err
-	} else {
-		return res.MatchedCount, err
-	}
+	return res.ModifiedCount, err
 }
 
 func (r *UserAdapter) Patch(ctx context.Context, user map[string]interface{}) (int64, error) {
-	userType := reflect.TypeOf(User{})
-	bsonMap := mgo.MakeBsonMap(userType)
 	filter := mgo.BuildQueryByIdFromMap(user, "id")
-	bson := mgo.MapToBson(user, bsonMap)
+	bson := mgo.MapToBson(user, r.Map)
 	return mgo.PatchOne(ctx, r.Collection, bson, filter)
 }
 
