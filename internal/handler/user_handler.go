@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/core-go/core"
-	"github.com/core-go/search"
+	s "github.com/core-go/search"
 	"github.com/gorilla/mux"
 	"net/http"
 	"reflect"
@@ -14,16 +14,17 @@ import (
 	. "go-service/internal/service"
 )
 
-func NewUserHandler(find func(context.Context, interface{}, interface{}, int64, int64) (int64, error), service UserService, logError func(context.Context, string,  ...map[string]interface{})) *UserHandler {
+func NewUserHandler(search func(context.Context, interface{}, interface{}, int64, int64) (int64, error), service UserService, logError func(context.Context, string,  ...map[string]interface{})) *UserHandler {
 	filterType := reflect.TypeOf(UserFilter{})
-	modelType := reflect.TypeOf(User{})
-	searchHandler := search.NewSearchHandler(find, modelType, filterType, logError, nil)
-	return &UserHandler{service: service, SearchHandler: searchHandler}
+	paramIndex, filterIndex := s.BuildParams(filterType)
+	return &UserHandler{service: service, search: search, paramIndex: paramIndex, filterIndex: filterIndex}
 }
 
 type UserHandler struct {
 	service UserService
-	*search.SearchHandler
+	search      func(context.Context, interface{}, interface{}, int64, int64) (int64, error)
+	paramIndex  map[string]int
+	filterIndex int
 }
 
 func (h *UserHandler) All(w http.ResponseWriter, r *http.Request) {
@@ -153,6 +154,19 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	} else {
 		JSON(w, http.StatusOK, res)
 	}
+}
+func (h *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
+	filter := UserFilter{Filter: &s.Filter{}}
+	s.Decode(r, &filter, h.paramIndex, h.filterIndex)
+
+	var users []User
+	offset := s.GetOffset(filter.Limit, filter.Page)
+	total, err := h.search(r.Context(), &filter, &users, filter.Limit, offset)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	JSON(w, 200, &s.Result{List: &users, Total: total})
 }
 
 func JSON(w http.ResponseWriter, code int, res interface{}) error {
