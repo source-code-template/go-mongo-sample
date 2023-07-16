@@ -2,17 +2,16 @@ package app
 
 import (
 	"context"
+
+	v "github.com/core-go/core/v10"
 	"github.com/core-go/health"
 	"github.com/core-go/log"
 	mgo "github.com/core-go/mongo"
-	"github.com/core-go/search"
-	"github.com/core-go/search/mongo"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"reflect"
 
 	. "go-service/internal/handler"
-	. "go-service/internal/model"
 	. "go-service/internal/repository"
 	. "go-service/internal/service"
 )
@@ -28,15 +27,12 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	logError := log.LogError
+	validator := v.NewValidator()
 
-	userType := reflect.TypeOf(User{})
-	userQuery := query.UseQuery(userType)
-	userSearchBuilder := mgo.NewSearchBuilder(db, "users", userQuery, search.GetSort)
-	userRepository := NewUserAdapter(db)
+	userRepository := NewUserAdapter(db, nil)
 	userService := NewUserUseCase(userRepository)
-	userHandler := NewUserHandler(userSearchBuilder.Search, userService, logError)
+	userHandler := NewUserHandler(userService, validator.Validate, logError)
 
 	mongoChecker := mgo.NewHealthChecker(db)
 	healthHandler := health.NewHandler(mongoChecker)

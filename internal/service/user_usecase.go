@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	. "go-service/internal/filter"
 	. "go-service/internal/model"
 	. "go-service/internal/repository"
 )
@@ -15,7 +16,7 @@ type UserUseCase struct {
 	repository UserRepository
 }
 
-func (s *UserUseCase) All(ctx context.Context) (*[]User, error) {
+func (s *UserUseCase) All(ctx context.Context) ([]User, error) {
 	return s.repository.All(ctx)
 }
 func (s *UserUseCase) Load(ctx context.Context, id string) (*User, error) {
@@ -32,4 +33,7 @@ func (s *UserUseCase) Patch(ctx context.Context, user map[string]interface{}) (i
 }
 func (s *UserUseCase) Delete(ctx context.Context, id string) (int64, error) {
 	return s.repository.Delete(ctx, id)
+}
+func (s *UserUseCase) Search(ctx context.Context, filter *UserFilter) ([]User, int64, error) {
+	return s.repository.Search(ctx, filter)
 }

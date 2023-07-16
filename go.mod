@@ -9,7 +9,8 @@ require (
 	github.com/core-go/log v0.1.3
 	github.com/core-go/middleware v0.1.1
 	github.com/core-go/mongo v0.3.3
-	github.com/core-go/search v0.2.10
+	github.com/core-go/search v0.2.12
+	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
