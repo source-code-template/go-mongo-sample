@@ -14,6 +14,8 @@ import (
 	. "go-service/internal/service"
 )
 
+const InternalServerError = "Internal Server Error"
+
 func NewUserHandler(service UserService, validate func(context.Context, interface{}) ([]core.ErrorMessage, error), logError func(context.Context, string,  ...map[string]interface{})) *UserHandler {
 	userType := reflect.TypeOf(User{})
 	_, jsonMap, _ := core.BuildMapField(userType)
@@ -64,7 +66,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	errors, er2 := h.Validate(r.Context(), &user)
 	if er2 != nil {
 		h.LogError(r.Context(), er2.Error())
-		http.Error(w, core.InternalServerError, http.StatusInternalServerError)
+		http.Error(w, InternalServerError, http.StatusInternalServerError)
 		return
 	}
 	if len(errors) > 0 {
@@ -101,7 +103,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	errors, er2 := h.Validate(r.Context(), &user)
 	if er2 != nil {
 		h.LogError(r.Context(), er2.Error())
-		http.Error(w, core.InternalServerError, http.StatusInternalServerError)
+		http.Error(w, InternalServerError, http.StatusInternalServerError)
 		return
 	}
 	if len(errors) > 0 {
@@ -144,7 +146,7 @@ func (h *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	errors, er3 := h.Validate(r.Context(), &user)
 	if er3 != nil {
 		h.LogError(r.Context(), er3.Error())
-		http.Error(w, core.InternalServerError, http.StatusInternalServerError)
+		http.Error(w, InternalServerError, http.StatusInternalServerError)
 		return
 	}
 	if len(errors) > 0 {

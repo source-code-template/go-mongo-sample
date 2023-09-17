@@ -22,23 +22,6 @@ tags:
       url: http://swagger.io
 paths:
   /users:
-    get:
-      tags:
-        - user
-      summary: Get all users
-      description: 'Get all users'
-      operationId: getAllUsers
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-        '500':
-          description: Internal Server Error
     post:
       tags:
         - user
@@ -60,6 +43,14 @@ paths:
                 type: integer
         '400':
           description: Invalid user supplied
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
   /users/{userId}:
@@ -123,6 +114,14 @@ paths:
             application/json:
               schema:
                 type: integer
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
     patch:
@@ -139,7 +138,7 @@ paths:
           schema:
             type: string
       requestBody:
-        description: Update an existent user in the store
+        description: a partial user
         content:
           application/json:
             schema:
@@ -159,6 +158,14 @@ paths:
             application/json:
               schema:
                 type: integer
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
     delete:
@@ -302,6 +309,17 @@ components:
           type: string
           format: 'date-time'
           example: '1975-11-16T00:00:00+07:00'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: error code, such as required, min, max, email, url, phone, password...
+          example: 'required'
+        field:
+          type: string
+          description: error field
+          example: 'username'
     User:
       type: object
       required:

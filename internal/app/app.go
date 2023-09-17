@@ -18,7 +18,7 @@ import (
 
 type ApplicationContext struct {
 	Health *health.Handler
-	User   UserPort
+	User   UserTransport
 }
 
 func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
@@ -28,9 +28,12 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 		return nil, err
 	}
 	logError := log.LogError
-	validator := v.NewValidator()
+	validator, err := v.NewValidator()
+	if err != nil {
+		return nil, err
+	}
 
-	userRepository := NewUserAdapter(db, nil)
+	userRepository := NewUserAdapter(db, BuildQuery)
 	userService := NewUserUseCase(userRepository)
 	userHandler := NewUserHandler(userService, validator.Validate, logError)
 

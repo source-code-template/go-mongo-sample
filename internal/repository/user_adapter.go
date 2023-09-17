@@ -151,17 +151,6 @@ func BuildQuery(filter *UserFilter) (bson.D, bson.M) {
 		query = append(query, bson.E{Key: "phone", Value: primitive.Regex{Pattern: fmt.Sprintf("\\w*%v\\w*", filter.Phone), Options: "i"}})
 	}
 
-	userType := reflect.TypeOf(User{})
-	if len(filter.Fields) > 0 {
-		var fields = bson.M{}
-		for _, key := range filter.Fields {
-			_, _, columnName := mgo.GetFieldByJson(userType, key)
-			if len(columnName) < 0 {
-				return query, nil
-			}
-			fields[columnName] = 1
-		}
-		return query, fields
-	}
-	return query, nil
+	fields := mgo.GetFields(filter.Fields, reflect.TypeOf(User{}))
+	return query, fields
 }
