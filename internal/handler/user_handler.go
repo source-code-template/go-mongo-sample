@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"reflect"
+
 	"github.com/core-go/core"
 	s "github.com/core-go/search"
 	"github.com/gorilla/mux"
-	"net/http"
-	"reflect"
 
 	. "go-service/internal/filter"
 	. "go-service/internal/model"

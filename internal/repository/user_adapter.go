@@ -3,15 +3,17 @@ package repository
 import (
 	"context"
 	"fmt"
-	mgo "github.com/core-go/mongo"
-	s "github.com/core-go/search"
-	"github.com/core-go/search/mongo"
+	"reflect"
+	"strings"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"reflect"
-	"strings"
+
+	mgo "github.com/core-go/mongo"
+	s "github.com/core-go/search"
+	"github.com/core-go/search/mongo"
 
 	. "go-service/internal/filter"
 	. "go-service/internal/model"
@@ -104,6 +106,7 @@ func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
 	}
 	return res.DeletedCount, err
 }
+
 func (r *UserAdapter) Search(ctx context.Context, filter *UserFilter) ([]User, int64, error) {
 	query, fields := BuildQuery(filter)
 	opts := options.Find()
