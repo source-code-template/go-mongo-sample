@@ -37,7 +37,7 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 	userService := NewUserUseCase(userRepository)
 	userHandler := NewUserHandler(userService, validator.Validate, logError)
 
-	mongoChecker := mgo.NewHealthChecker(db)
+	mongoChecker := mgo.NewHealthChecker(db.Client())
 	healthHandler := health.NewHandler(mongoChecker)
 
 	return &ApplicationContext{
