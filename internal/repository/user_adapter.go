@@ -13,7 +13,7 @@ import (
 
 	mgo "github.com/core-go/mongo"
 	s "github.com/core-go/search"
-	"github.com/core-go/search/mongo"
+	"github.com/core-go/search/mongo/query"
 
 	. "go-service/internal/filter"
 	. "go-service/internal/model"
