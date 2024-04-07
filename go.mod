@@ -4,14 +4,14 @@ go 1.17
 
 require (
 	github.com/core-go/config v1.0.1
-	github.com/core-go/core v0.3.8
+	github.com/core-go/core v0.6.1
 	github.com/core-go/health v1.0.0
 	github.com/core-go/log v1.0.0
 	github.com/core-go/middleware v1.0.0
-	github.com/core-go/mongo v0.3.5
-	github.com/core-go/search v1.0.1
-	github.com/gorilla/mux v1.8.0
-	go.mongodb.org/mongo-driver v1.12.1
+	github.com/core-go/mongo v0.3.6
+	github.com/core-go/search v1.0.2
+	github.com/gorilla/mux v1.8.1
+	go.mongodb.org/mongo-driver v1.12.2
 )
 
 require (
