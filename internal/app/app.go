@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 
-	v "github.com/core-go/core/v10"
 	"github.com/core-go/health"
 	"github.com/core-go/log"
 	mgo "github.com/core-go/mongo"
@@ -11,14 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	. "go-service/internal/handler"
-	. "go-service/internal/repository"
-	. "go-service/internal/service"
+	"go-service/internal/user"
 )
 
 type ApplicationContext struct {
 	Health *health.Handler
-	User   UserTransport
+	User   user.UserTransport
 }
 
 func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
@@ -28,14 +25,11 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 		return nil, err
 	}
 	logError := log.LogError
-	validator, err := v.NewValidator()
+
+	userHandler, err := user.NewUserHandler(ctx, db, logError)
 	if err != nil {
 		return nil, err
 	}
-
-	userRepository := NewUserAdapter(db, BuildQuery)
-	userService := NewUserUseCase(userRepository)
-	userHandler := NewUserHandler(userService, validator.Validate, logError)
 
 	mongoChecker := mgo.NewHealthChecker(db.Client())
 	healthHandler := health.NewHandler(mongoChecker)

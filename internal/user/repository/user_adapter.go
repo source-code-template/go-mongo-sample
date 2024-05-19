@@ -15,16 +15,15 @@ import (
 	s "github.com/core-go/search"
 	"github.com/core-go/search/mongo/query"
 
-	. "go-service/internal/filter"
-	. "go-service/internal/model"
+	"go-service/internal/user/model"
 )
 
-func NewUserAdapter(db *mongo.Database, buildQuery func(*UserFilter) (bson.D, bson.M)) *UserAdapter {
-	userType := reflect.TypeOf(User{})
+func NewUserAdapter(db *mongo.Database, buildQuery func(*model.UserFilter) (bson.D, bson.M)) *UserAdapter {
+	userType := reflect.TypeOf(model.User{})
 	bsonMap := mgo.MakeBsonMap(userType)
 	if buildQuery == nil {
 		build := query.UseQuery(userType)
-		buildQuery = func(filter *UserFilter) (d bson.D, m bson.M) {
+		buildQuery = func(filter *model.UserFilter) (d bson.D, m bson.M) {
 			return build(filter)
 		}
 	}
@@ -34,16 +33,16 @@ func NewUserAdapter(db *mongo.Database, buildQuery func(*UserFilter) (bson.D, bs
 type UserAdapter struct {
 	Collection *mongo.Collection
 	Map        map[string]string
-	BuildQuery func(*UserFilter) bson.D
+	BuildQuery func(*model.UserFilter) bson.D
 }
 
-func (r *UserAdapter) All(ctx context.Context) ([]User, error) {
+func (r *UserAdapter) All(ctx context.Context) ([]model.User, error) {
 	filter := bson.M{}
 	cursor, err := r.Collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
-	var users []User
+	var users []model.User
 	err = cursor.All(ctx, &users)
 	if err != nil {
 		return nil, err
@@ -51,7 +50,7 @@ func (r *UserAdapter) All(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
-func (r *UserAdapter) Load(ctx context.Context, id string) (*User, error) {
+func (r *UserAdapter) Load(ctx context.Context, id string) (*model.User, error) {
 	filter := bson.M{"_id": id}
 	res := r.Collection.FindOne(ctx, filter)
 	if res.Err() != nil {
@@ -61,7 +60,7 @@ func (r *UserAdapter) Load(ctx context.Context, id string) (*User, error) {
 			return nil, res.Err()
 		}
 	}
-	var user User
+	var user model.User
 	err := res.Decode(&user)
 	if err != nil {
 		return nil, err
@@ -69,7 +68,7 @@ func (r *UserAdapter) Load(ctx context.Context, id string) (*User, error) {
 	return &user, nil
 }
 
-func (r *UserAdapter) Create(ctx context.Context, user *User) (int64, error) {
+func (r *UserAdapter) Create(ctx context.Context, user *model.User) (int64, error) {
 	_, err := r.Collection.InsertOne(ctx, user)
 	if err != nil {
 		errMsg := err.Error()
@@ -85,7 +84,7 @@ func (r *UserAdapter) Create(ctx context.Context, user *User) (int64, error) {
 	return 1, nil
 }
 
-func (r *UserAdapter) Update(ctx context.Context, user *User) (int64, error) {
+func (r *UserAdapter) Update(ctx context.Context, user *model.User) (int64, error) {
 	filter := bson.M{"_id": user.Id}
 	update := bson.M{"$set": user}
 	res, err := r.Collection.UpdateOne(ctx, filter, update)
@@ -107,11 +106,11 @@ func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
 	return res.DeletedCount, err
 }
 
-func (r *UserAdapter) Search(ctx context.Context, filter *UserFilter) ([]User, int64, error) {
+func (r *UserAdapter) Search(ctx context.Context, filter *model.UserFilter) ([]model.User, int64, error) {
 	query, fields := BuildQuery(filter)
 	opts := options.Find()
 	if len(filter.Sort) > 0 {
-		opts.SetSort(mgo.BuildSort(filter.Sort, reflect.TypeOf(UserFilter{})))
+		opts.SetSort(mgo.BuildSort(filter.Sort, reflect.TypeOf(model.UserFilter{})))
 	}
 	offset := s.GetOffset(filter.Limit, filter.Page)
 	opts.SetSkip(offset)
@@ -122,7 +121,7 @@ func (r *UserAdapter) Search(ctx context.Context, filter *UserFilter) ([]User, i
 		opts.Projection = fields
 	}
 
-	var users []User
+	var users []model.User
 	cursor, err := r.Collection.Find(ctx, query, opts)
 	if err != nil {
 		if strings.Contains(err.Error(), "mongo: no documents in result") {
@@ -139,7 +138,7 @@ func (r *UserAdapter) Search(ctx context.Context, filter *UserFilter) ([]User, i
 	return users, total, err
 }
 
-func BuildQuery(filter *UserFilter) (bson.D, bson.M) {
+func BuildQuery(filter *model.UserFilter) (bson.D, bson.M) {
 	query := bson.D{}
 	if len(filter.Id) > 0 {
 		query = append(query, bson.E{Key: "_id", Value: filter.Id})
@@ -154,6 +153,6 @@ func BuildQuery(filter *UserFilter) (bson.D, bson.M) {
 		query = append(query, bson.E{Key: "phone", Value: primitive.Regex{Pattern: fmt.Sprintf("\\w*%v\\w*", filter.Phone), Options: "i"}})
 	}
 
-	fields := mgo.GetFields(filter.Fields, reflect.TypeOf(User{}))
+	fields := mgo.GetFields(filter.Fields, reflect.TypeOf(model.User{}))
 	return query, fields
 }
