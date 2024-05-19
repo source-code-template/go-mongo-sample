@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/mongo"
-
 	v "github.com/core-go/core/v10"
 
 	"go-service/internal/user/handler"
