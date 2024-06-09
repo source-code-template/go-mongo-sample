@@ -72,11 +72,11 @@ func (r *UserAdapter) Create(ctx context.Context, user *model.User) (int64, erro
 	_, err := r.Collection.InsertOne(ctx, user)
 	if err != nil {
 		errMsg := err.Error()
-		if strings.Index(errMsg, "duplicate key error collection:") >= 0 {
-			if strings.Index(errMsg, "dup key: { _id: ") >= 0 {
-				return 0, nil
+		if strings.Contains(errMsg, "duplicate key error collection:") {
+			if strings.Contains(errMsg, "dup key: { _id: ") {
+				return 0, err
 			} else {
-				return -1, nil
+				return -1, err
 			}
 		}
 		return 0, err
