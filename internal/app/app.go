@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/core-go/health"
-	"github.com/core-go/log"
+	"github.com/core-go/log/zap"
 	mgo "github.com/core-go/mongo/health"
 
 	"go-service/internal/user"
