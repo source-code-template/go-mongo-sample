@@ -33,6 +33,6 @@ func (s *UserUseCase) Patch(ctx context.Context, user map[string]interface{}) (i
 func (s *UserUseCase) Delete(ctx context.Context, id string) (int64, error) {
 	return s.repository.Delete(ctx, id)
 }
-func (s *UserUseCase) Search(ctx context.Context, filter *model.UserFilter) ([]model.User, int64, error) {
-	return s.repository.Search(ctx, filter)
+func (s *UserUseCase) Search(ctx context.Context, filter *model.UserFilter, limit int64, offset int64) ([]model.User, int64, error) {
+	return s.repository.Search(ctx, filter, limit, offset)
 }

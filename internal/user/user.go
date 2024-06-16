@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	v "github.com/core-go/core/v10"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"go-service/internal/user/handler"
 	"go-service/internal/user/repository"
@@ -22,13 +22,14 @@ type UserTransport interface {
 	Delete(w http.ResponseWriter, r *http.Request)
 }
 
-func NewUserHandler(ctx context.Context, db *mongo.Database, logError func(context.Context, string, ...map[string]interface{})) (UserTransport,error) {
+func NewUserHandler(ctx context.Context, db *mongo.Database, logError func(context.Context, string, ...map[string]interface{})) (UserTransport, error) {
 	validator, err := v.NewValidator()
 	if err != nil {
 		return nil, err
 	}
 
 	userRepository := repository.NewUserAdapter(db, repository.BuildQuery)
+	// userRepository := adapter.NewSearchAdapterWithVersion[model.User, string, *model.UserFilter]()
 	userService := service.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userService, validator.Validate, logError)
 	return userHandler, nil

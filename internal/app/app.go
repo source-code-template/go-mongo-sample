@@ -8,7 +8,7 @@ import (
 
 	"github.com/core-go/health"
 	"github.com/core-go/log"
-	mgo "github.com/core-go/mongo"
+	mgo "github.com/core-go/mongo/health"
 
 	"go-service/internal/user"
 )

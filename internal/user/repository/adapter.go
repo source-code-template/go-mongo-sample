@@ -12,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	mgo "github.com/core-go/mongo"
-	s "github.com/core-go/search"
 	"github.com/core-go/search/mongo/query"
 
 	"go-service/internal/user/model"
@@ -106,16 +105,15 @@ func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
 	return res.DeletedCount, err
 }
 
-func (r *UserAdapter) Search(ctx context.Context, filter *model.UserFilter) ([]model.User, int64, error) {
+func (r *UserAdapter) Search(ctx context.Context, filter *model.UserFilter, limit int64, offset int64) ([]model.User, int64, error) {
 	query, fields := BuildQuery(filter)
 	opts := options.Find()
 	if len(filter.Sort) > 0 {
 		opts.SetSort(mgo.BuildSort(filter.Sort, reflect.TypeOf(model.UserFilter{})))
 	}
-	offset := s.GetOffset(filter.Limit, filter.Page)
 	opts.SetSkip(offset)
 	if filter.Limit > 0 {
-		opts.SetLimit(filter.Limit)
+		opts.SetLimit(limit)
 	}
 	if fields != nil {
 		opts.Projection = fields

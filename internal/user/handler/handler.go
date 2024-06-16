@@ -16,7 +16,7 @@ import (
 
 const InternalServerError = "Internal Server Error"
 
-func NewUserHandler(service service.UserService, validate func(context.Context, interface{}) ([]core.ErrorMessage, error), logError func(context.Context, string,  ...map[string]interface{})) *UserHandler {
+func NewUserHandler(service service.UserService, validate func(context.Context, interface{}) ([]core.ErrorMessage, error), logError func(context.Context, string, ...map[string]interface{})) *UserHandler {
 	userType := reflect.TypeOf(model.User{})
 	_, jsonMap, _ := core.BuildMapField(userType)
 	filterType := reflect.TypeOf(model.UserFilter{})
@@ -179,8 +179,9 @@ func (h *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
 	filter := model.UserFilter{Filter: &s.Filter{}}
 	s.Decode(r, &filter, h.paramIndex, h.filterIndex)
 
+	offset := s.GetOffset(filter.Limit, filter.Page)
 	var users []model.User
-	users, total, err := h.service.Search(r.Context(), &filter)
+	users, total, err := h.service.Search(r.Context(), &filter, filter.Limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
