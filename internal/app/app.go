@@ -26,7 +26,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	}
 	logError := log.LogError
 
-	userHandler, err := user.NewUserHandler(ctx, db, logError)
+	userHandler, err := user.NewUserHandler(db, logError)
 	if err != nil {
 		return nil, err
 	}

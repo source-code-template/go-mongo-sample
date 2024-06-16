@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -91,9 +92,12 @@ func (r *UserAdapter) Update(ctx context.Context, user *model.User) (int64, erro
 }
 
 func (r *UserAdapter) Patch(ctx context.Context, user map[string]interface{}) (int64, error) {
-	filter := mgo.BuildQueryByIdFromMap(user, "id")
+	id, ok := user["id"]
+	if !ok {
+		return -1, errors.New("_id must be in map[string]interface{} for patch")
+	}
 	bson := mgo.MapToBson(user, r.Map)
-	return mgo.PatchOne(ctx, r.Collection, bson, filter)
+	return mgo.PatchOne(ctx, r.Collection, id, bson)
 }
 
 func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
