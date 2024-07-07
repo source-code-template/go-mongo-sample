@@ -29,8 +29,6 @@ func NewUserHandler(db *mongo.Database, logError func(context.Context, string, .
 	}
 
 	userRepository := adapter.NewUserAdapter(db, adapter.BuildQuery)
-	// userRepository := adapter.NewSearchAdapterWithVersion[model.User, string, *model.UserFilter](db, "users", adapter2.BuildQuery, search.GetSort, "Version", mapper)
-	// userRepository.ObjectId = false
 	userService := service.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userService, validator.Validate, logError)
 	return userHandler, nil

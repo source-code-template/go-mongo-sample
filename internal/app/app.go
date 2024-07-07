@@ -20,10 +20,10 @@ type ApplicationContext struct {
 
 func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Mongo.Uri))
-	db := client.Database(cfg.Mongo.Database)
 	if err != nil {
 		return nil, err
 	}
+	db := client.Database(cfg.Mongo.Database)
 	logError := log.LogError
 
 	userHandler, err := user.NewUserHandler(db, logError)
@@ -31,7 +31,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		return nil, err
 	}
 
-	mongoChecker := mgo.NewHealthChecker(db.Client())
+	mongoChecker := mgo.NewHealthChecker(client)
 	healthHandler := health.NewHandler(mongoChecker)
 
 	return &ApplicationContext{
