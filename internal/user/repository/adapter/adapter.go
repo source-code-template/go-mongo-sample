@@ -140,6 +140,18 @@ func BuildQuery(filter *model.UserFilter) (bson.D, bson.M) {
 	if len(filter.Id) > 0 {
 		query = append(query, bson.E{Key: "_id", Value: filter.Id})
 	}
+	if filter.DateOfBirth != nil {
+		dobFilter := bson.M{}
+		if filter.DateOfBirth.Min != nil {
+			dobFilter["$gte"] = filter.DateOfBirth.Min
+		}
+		if filter.DateOfBirth.Max != nil {
+			dobFilter["$lte"] = filter.DateOfBirth.Max
+		}
+		if len(dobFilter) > 0 {
+			query = append(query, bson.E{Key: "dateOfBirth", Value: dobFilter})
+		}
+	}
 	if len(filter.Username) > 0 {
 		query = append(query, bson.E{Key: "username", Value: primitive.Regex{Pattern: fmt.Sprintf("^%v", filter.Username), Options: "i"}})
 	}
