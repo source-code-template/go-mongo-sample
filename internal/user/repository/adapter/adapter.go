@@ -13,20 +13,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	mgo "github.com/core-go/mongo"
-	"github.com/core-go/search/mongo/query"
-
 	"go-service/internal/user/model"
 )
 
 func NewUserAdapter(db *mongo.Database, buildQuery func(*model.UserFilter) (bson.D, bson.M)) *UserAdapter {
 	userType := reflect.TypeOf(model.User{})
 	bsonMap := mgo.MakeBsonMap(userType)
-	if buildQuery == nil {
-		build := query.UseQuery(userType)
-		buildQuery = func(filter *model.UserFilter) (d bson.D, m bson.M) {
-			return build(filter)
-		}
-	}
 	return &UserAdapter{Collection: db.Collection("users"), Map: bsonMap, BuildQuery: buildQuery}
 }
 
