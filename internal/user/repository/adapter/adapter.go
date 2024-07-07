@@ -27,13 +27,13 @@ func NewUserAdapter(db *mongo.Database, buildQuery func(*model.UserFilter) (bson
 			return build(filter)
 		}
 	}
-	return &UserAdapter{Collection: db.Collection("users"), Map: bsonMap}
+	return &UserAdapter{Collection: db.Collection("users"), Map: bsonMap, BuildQuery: buildQuery}
 }
 
 type UserAdapter struct {
 	Collection *mongo.Collection
 	Map        map[string]string
-	BuildQuery func(*model.UserFilter) bson.D
+	BuildQuery func(*model.UserFilter) (bson.D, bson.M)
 }
 
 func (r *UserAdapter) All(ctx context.Context) ([]model.User, error) {
@@ -110,33 +110,28 @@ func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
 }
 
 func (r *UserAdapter) Search(ctx context.Context, filter *model.UserFilter, limit int64, offset int64) ([]model.User, int64, error) {
-	query, fields := BuildQuery(filter)
+	query, fields := r.BuildQuery(filter)
+	var users []model.User
+	total, err := r.Collection.CountDocuments(ctx, query)
+	if err != nil || total == 0 {
+		return users, total, err
+	}
 	opts := options.Find()
 	if len(filter.Sort) > 0 {
 		opts.SetSort(mgo.BuildSort(filter.Sort, reflect.TypeOf(model.UserFilter{})))
 	}
 	opts.SetSkip(offset)
-	if filter.Limit > 0 {
+	if limit > 0 {
 		opts.SetLimit(limit)
 	}
 	if fields != nil {
 		opts.Projection = fields
 	}
-
-	var users []model.User
 	cursor, err := r.Collection.Find(ctx, query, opts)
 	if err != nil {
-		if strings.Contains(err.Error(), "mongo: no documents in result") {
-			return users, 0, nil
-		}
-		return users, 0, err
+		return users, total, err
 	}
-
 	err = cursor.All(ctx, &users)
-	if err != nil {
-		return users, 0, err
-	}
-	total, err := r.Collection.CountDocuments(ctx, query)
 	return users, total, err
 }
 
