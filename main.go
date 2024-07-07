@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
+
 	"github.com/core-go/config"
-	"github.com/core-go/core"
+	srv "github.com/core-go/core/server"
 	"github.com/core-go/log/zap"
 	mid "github.com/core-go/middleware"
 	"github.com/gorilla/mux"
@@ -32,8 +33,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Info(ctx, core.ServerInfo(conf.Server))
-	server := core.CreateServer(conf.Server, r)
+	log.Info(ctx, srv.ServerInfo(conf.Server))
+	server := srv.CreateServer(conf.Server, r)
 	if err = server.ListenAndServe(); err != nil {
 		log.Error(ctx, err.Error())
 	}
