@@ -80,16 +80,20 @@ func (r *UserAdapter) Update(ctx context.Context, user *model.User) (int64, erro
 	filter := bson.M{"_id": user.Id}
 	update := bson.M{"$set": user}
 	res, err := r.Collection.UpdateOne(ctx, filter, update)
-	return res.ModifiedCount, err
+	if res != nil {
+		return res.ModifiedCount, err
+	} else {
+		return 0, err
+	}
 }
 
 func (r *UserAdapter) Patch(ctx context.Context, user map[string]interface{}) (int64, error) {
 	id, ok := user["id"]
 	if !ok {
-		return -1, errors.New("_id must be in map[string]interface{} for patch")
+		return -1, errors.New("id must be in map[string]interface{} for patch")
 	}
-	bson := mgo.MapToBson(user, r.Map)
-	return mgo.PatchOne(ctx, r.Collection, id, bson)
+	bsonUser := mgo.MapToBson(user, r.Map)
+	return mgo.PatchOne(ctx, r.Collection, id, bsonUser)
 }
 
 func (r *UserAdapter) Delete(ctx context.Context, id string) (int64, error) {
