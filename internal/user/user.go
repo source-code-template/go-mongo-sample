@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	v "github.com/core-go/core/v10"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	v "github.com/core-go/core/v10"
 
 	"go-service/internal/user/handler"
 	"go-service/internal/user/repository/adapter"
