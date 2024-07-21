@@ -1,4 +1,4 @@
-# go-mongo-layer-architecture-sample
+# go-mongo-sample
 
 #### To run the application
 ```shell

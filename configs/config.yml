@@ -1,5 +1,5 @@
 server:
-  name: go-mongo-layer-architecture-sample
+  name: go-mongo-sample
   port: 8080
 
 mongo:
